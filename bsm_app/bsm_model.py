@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.stats import norm
 
+# This file will contain all the core calculations
 
 def black_scholes(S, K, T, r, sigma, option_type='call'):
     '''

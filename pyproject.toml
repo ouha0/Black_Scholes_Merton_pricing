@@ -1,0 +1,8 @@
+# In pyproject.toml
+
+[tool.ruff.lint]
+# Ignore both unused variables and long lines.
+ignore = [
+    "F841",
+    "E501",
+]
