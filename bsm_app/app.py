@@ -20,21 +20,21 @@ st.sidebar.header("Model Parameters")
 
 # User inputs
 S = st.sidebar.number_input(
-    "Spot Price (S)", min_value=0.1, value=100.0, step=0.01)
+    "Spot Price (S)", min_value=0.1, value=40.0, step=0.01)
 
 K = st.sidebar.number_input(
-    "Strike Price (K)", min_value=0.1, value=100.0, step=0.01)
+    "Strike Price (K)", min_value=0.1, value=45.0, step=0.01)
 
 T = st.sidebar.number_input(
-    "Time to Maturity (T in years)", min_value=0.01, value=1.0, step=0.01)
+    "Time to Maturity (T in years)", min_value=0.01, value=0.33, step=0.01)
 
 r = st.sidebar.slider("Risk-Free Rate (r)", 0.0, 0.2,
-                      0.05, 0.001, format="%.3f")
+                      value=0.03, step=0.001, format="%.3f")
 
-sigma = st.sidebar.slider("Volatility (σ)", 0.01, 1.0, 0.2, 0.01)
+sigma = st.sidebar.slider("Volatility (σ)", 0.01, 1.0, value=0.4, step=0.01)
 
 purchase_price = st.sidebar.number_input(
-    "Purchase Price", min_value=0.0, value=10.0, step=0.01)
+    "Purchase Price", min_value=0.0, value=5.0, step=0.01)
 
 
 # Calculations
@@ -112,9 +112,32 @@ analysis_type = st.radio(
 
 
 # --- Data generation for heatmap ---
-# Create 20 evenly spaced numbers between the specified range
-spot_range = np.linspace(S * 0.75, S * 1.25, 20)
-vol_range = np.linspace(sigma * 0.5, sigma * 1.5, 20)
+# Evenly spaced numbers between the specified range
+st.header("Sensitivity Analysis")
+
+sel_col1, sel_col2 = st.columns(2)
+
+with sel_col1:
+    option_choice = st.radio(
+        "Select Option Type for Heatmap",
+        ('Call', 'Put'),
+        horizontal=True
+    )
+    show_values = st.checkbox("Show values on heatmap", value=False)
+
+with sel_col2:
+    analysis_type = st.radio(
+        "Select Analysis Value",
+        ('Option Price', 'PNL'),
+        horizontal=True,
+        key='analysis_type'
+    )
+
+# Range of values
+res = 15
+
+spot_range = np.linspace(S * 0.75, S * 1.25, res)
+vol_range = np.linspace(sigma * 0.5, sigma * 1.5, res)
 
 # Emtpy grid
 heatmap_data = np.zeros((len(spot_range), len(vol_range)))
@@ -122,7 +145,8 @@ heatmap_data = np.zeros((len(spot_range), len(vol_range)))
 # Fill in data of heatmap grid
 for i, spot in enumerate(spot_range):
     for j, vol in enumerate(vol_range):
-        heatmap_data[i, j] = bsm.black_scholes(spot, K, T, r, vol, 'call')
+        heatmap_data[i, j] = bsm.black_scholes(
+            spot, K, T, r, vol, option_choice.lower())
 
 # Change heatmap data values if PNL heatmap
 if (analysis_type == 'PNL'):
@@ -144,10 +168,21 @@ fig = go.Figure(data=go.Heatmap(
     colorbar=dict(title=analysis_type)
 ))
 
+if show_values:
+    fig.update_traces(
+        text=display_data,
+        texttemplate="%{text:.2f}"
+    )
+
 fig.update_layout(
     title=chart_title,
     xaxis_title="Volatility (σ)",
-    yaxis_title="Spot Price (S)"
+    yaxis_title="Spot Price (S)",
+    autosize=False,
+    width=700,
+    height=700,
+    margin=dict(l=50, r=50, b=100, t=100, pad=4)
 )
+
 
 st.plotly_chart(fig, use_container_width=True)
