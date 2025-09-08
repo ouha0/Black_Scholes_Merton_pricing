@@ -21,13 +21,18 @@ st.sidebar.header("Model Parameters")
 # User inputs
 S = st.sidebar.number_input(
     "Spot Price (S)", min_value=0.1, value=100.0, step=0.01)
+
 K = st.sidebar.number_input(
     "Strike Price (K)", min_value=0.1, value=100.0, step=0.01)
+
 T = st.sidebar.number_input(
     "Time to Maturity (T in years)", min_value=0.01, value=1.0, step=0.01)
+
 r = st.sidebar.slider("Risk-Free Rate (r)", 0.0, 0.2,
                       0.05, 0.001, format="%.3f")
+
 sigma = st.sidebar.slider("Volatility (σ)", 0.01, 1.0, 0.2, 0.01)
+
 purchase_price = st.sidebar.number_input(
     "Purchase Price", min_value=0.0, value=10.0, step=0.01)
 
@@ -96,3 +101,53 @@ with row2_cols[0]:
 with row2_cols[1]:
     st.metric("Call Rho", f"{call_rho:.4f}")
     st.metric("Put Rho", f"{put_rho:.4f}")
+
+
+# --- Heatmap Sentitivity Analysis ---
+analysis_type = st.radio(
+    "Select Analysis Type",
+    ("Option Price", 'PNL'),
+    horizontal=True
+)
+
+
+# --- Data generation for heatmap ---
+# Create 20 evenly spaced numbers between the specified range
+spot_range = np.linspace(S * 0.75, S * 1.25, 20)
+vol_range = np.linspace(sigma * 0.5, sigma * 1.5, 20)
+
+# Emtpy grid
+heatmap_data = np.zeros((len(spot_range), len(vol_range)))
+
+# Fill in data of heatmap grid
+for i, spot in enumerate(spot_range):
+    for j, vol in enumerate(vol_range):
+        heatmap_data[i, j] = bsm.black_scholes(spot, K, T, r, vol, 'call')
+
+# Change heatmap data values if PNL heatmap
+if (analysis_type == 'PNL'):
+    display_data = heatmap_data - purchase_price
+    colorscale = 'RdYlGn'
+    chart_title = 'Call PNL sensitivity to Spot Price and Volatility'
+else:
+    display_data = heatmap_data
+    colorscale = 'Viridis'  # Default
+    chart_title = 'Call Price sensitivity to Spot Price and Volatility'
+
+# --- Plotly for heatmap ---
+fig = go.Figure(data=go.Heatmap(
+    z=display_data,
+    x=np.round(vol_range, 3),
+    y=np.round(spot_range, 2),
+    hoverongaps=False,  # Missing values
+    colorscale=colorscale,
+    colorbar=dict(title=analysis_type)
+))
+
+fig.update_layout(
+    title=chart_title,
+    xaxis_title="Volatility (σ)",
+    yaxis_title="Spot Price (S)"
+)
+
+st.plotly_chart(fig, use_container_width=True)
