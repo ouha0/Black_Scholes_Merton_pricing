@@ -3,6 +3,7 @@ from scipy.stats import norm
 
 # This file will contain all the core calculations
 
+
 def black_scholes(S, K, T, r, sigma, option_type='call'):
     '''
     Calculate the BSM option price for a call or option.
@@ -51,6 +52,7 @@ def gamma(S, K, T, r, sigma):
     return (norm.pdf(d1, 0.0, 1.0) / (S * sigma * np.sqrt(T)))
 
 
+# Vega is sensitivity of price and volatility
 def vega(S, K, T, r, sigma):
     d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
     return (S * norm.pdf(d1, 0.0, 1.0) * np.sqrt(T))
@@ -82,3 +84,35 @@ def rho(S, K, T, r, sigma, option_type='call'):
         return (-K * T * np.exp(-r * T) * norm.cdf(-d2, 0.0, 1.0))
     else:
         raise ValueError("Invalid option type. Choose 'call' or 'put'")
+
+
+# Solves for implied volatility; returns none if vega is 0 (Option price insensitive to volatility)
+def implied_volatility(market_price, S, K, T, r, option_type='call'):
+    '''
+    Function to calculate the implied Volatility; No closed form solution
+    , use Newton's method (Root finding technique). In some ways similar to gradient descent
+    '''
+    import bsm_model
+
+    ITERATIONS = 100
+    TOLERENCE = 1.0e-5  # Stop algorithm if "good enough"
+
+    sigma = 0.5  # Intial guess
+
+    for i in range(ITERATIONS):
+        price = bsm_model.black_scholes(S, K, T, sigma, option_type)
+        vega = bsm_model.vega(S, K, T, r, sigma)
+
+        diff = price - market_price
+
+        # Stop if estimate good enough
+        if abs(diff) < TOLERENCE:
+            return sigma
+
+        # When Vega is zero, cannot solve; option price insensitive to price change. Happens at expiry 
+        if vega == 0:
+            return None
+
+        sigma = sigma - (diff / vega)
+
+    return sigma
