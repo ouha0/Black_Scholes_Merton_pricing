@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.stats import norm
+import math
 
 # This file will contain all the core calculations
 
@@ -86,22 +87,25 @@ def rho(S, K, T, r, sigma, option_type='call'):
         raise ValueError("Invalid option type. Choose 'call' or 'put'")
 
 
-# Solves for implied volatility; returns none if vega is 0 (Option price insensitive to volatility)
+''' 
+Solves for implied volatility; returns none
+if vega is 0 (Option price insensitive to volatility)
+'''
+
+
 def implied_volatility(market_price, S, K, T, r, option_type='call'):
     '''
     Function to calculate the implied Volatility; No closed form solution
     , use Newton's method (Root finding technique). In some ways similar to gradient descent
     '''
-    import bsm_model
-
     ITERATIONS = 100
     TOLERENCE = 1.0e-5  # Stop algorithm if "good enough"
 
     sigma = 0.5  # Intial guess
 
     for i in range(ITERATIONS):
-        price = bsm_model.black_scholes(S, K, T, sigma, option_type)
-        vega = bsm_model.vega(S, K, T, r, sigma)
+        price = black_scholes(S, K, T, r, sigma, option_type)
+        curr_vega = vega(S, K, T, r, sigma)
 
         diff = price - market_price
 
@@ -109,10 +113,10 @@ def implied_volatility(market_price, S, K, T, r, option_type='call'):
         if abs(diff) < TOLERENCE:
             return sigma
 
-        # When Vega is zero, cannot solve; option price insensitive to price change. Happens at expiry 
-        if vega == 0:
+        # When Vega is zero, cannot solve; option price insensitive to price change. Happens at expiry
+        if abs(curr_vega) < 1e-6:
             return None
 
-        sigma = sigma - (diff / vega)
+        sigma = sigma - (diff / curr_vega)
 
-    return sigma
+    return None
