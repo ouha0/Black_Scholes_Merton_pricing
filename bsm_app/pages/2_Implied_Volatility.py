@@ -49,6 +49,10 @@ def get_option_chain_for_date(ticker, expiry_date):
 ticker = st.text_input("Enter a Ticker (e.g., SPY, AAPL, NVDA)", "NVDA")
 
 
+min_volume = 50
+min_open_interest = 100
+
+
 if ticker:
     S = get_stock_price(ticker)
     expiries = get_expiration_dates(ticker)
@@ -82,7 +86,9 @@ if ticker:
                 # Create a copy to modify; allows calls_df to be cached
                 calls_df = calls.copy()
                 # Keep call options that have some volume
-                calls_df = calls_df[calls_df['volume'] > 10]
+                calls_df = calls_df[calls_df['volume'] > min_volume]
+                calls_df = calls_df[calls_df['openInterest']
+                                    > min_open_interest]
                 # estimate option price; Use last price when market is not open
                 calls_df['marketPrice'] = np.where(
                     (calls_df['bid'] > 0) & (calls_df['ask'] > 0),
@@ -102,7 +108,8 @@ if ticker:
             # --- Put ---
             if puts is not None and not puts.empty:
                 puts_df = puts.copy()
-                puts_df = puts_df[puts_df['volume'] > 10]
+                puts_df = puts_df[puts_df['volume'] > min_volume]
+                puts_df = puts_df[puts_df['openInterest'] > min_open_interest]
                 puts_df['marketPrice'] = np.where(
                     (puts_df['bid'] > 0) & (puts_df['ask'] > 0),
                     (puts_df['bid'] + puts_df['ask']) / 2,
@@ -118,6 +125,10 @@ if ticker:
                     subset=['impliedVolatility'])
 
             # --- Create IV Plot ---
+            '''
+            Outliers of the IV Graph may be lack of liquidity?
+            Especially when using lastPrice
+            '''
             fig = go.Figure()
 
             if results_df_calls is not None and not results_df_calls.empty:

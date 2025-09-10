@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.stats import norm
-import math
 
 # This file will contain all the core calculations
 

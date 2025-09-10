@@ -14,6 +14,8 @@ st.set_page_config(
 
 # Title
 st.title("Black-Scholes-Merton Option Pricer")
+st.markdown(
+    "A tool to calculate option prices, Greeks, and visualise sensitivities")
 
 # Sidebar for user inputs
 st.sidebar.header("Model Parameters")
@@ -58,7 +60,7 @@ with col1:
 with col2:
     st.metric("Put Option Price", f"${put_price:.3f}")
     st.metric("Put PNL", f"${put_pnl:.3f}",
-              delta=f"{((put_price/ purchase_price) - 1) * 100 if purchase_price > 0 else 0:.2f}%")
+              delta=f"{((put_price / purchase_price) - 1) * 100 if purchase_price > 0 else 0:.2f}%")
 
 # The Greeks
 st.header("The Greeks")
