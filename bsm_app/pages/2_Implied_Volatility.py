@@ -74,7 +74,14 @@ if ticker:
             # Convert to proper python datetime object; get maturity using current day
             expiry_date = pd.to_datetime(selected_expiry)
             today = pd.to_datetime('today').normalize()
-            T = (expiry_date - today).days / 365.25
+            days_to_expiry = (expiry_date - today).days
+
+            # When days to expiry is very soon. (T is too close to zero; not reliable)
+            if days_to_expiry < 1:
+                st.warning(f"The selected expiry date ({
+                           expiry_date}) is within 1 day. Implied Volatility canot be reliably calculated.")
+            else:
+                T = days_to_expiry / 365.25  # annualized
 
             # --- Calculate Implied Vol and Plot ---
             st.subheader(f"Volatility Smile for {selected_expiry} expiry")
