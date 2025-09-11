@@ -28,9 +28,39 @@ Black-Scholes-Merton model and for analyzing real-world implied volatility (surf
 * **Financial Data:** yfinance API
 
 
-## How to Run Locally...
+## How to Run Locally
 
+### 1, Clone the Repository
+```bash
+git clone https://github.com/ouha0/Black_Scholes_Merton_pricing.git
+cd Black_Scholes_Merton_pricing
+```
 
+### 2. Create and Activate Virtual Environment
+*   **On macOS / Linux:**
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+*   **On Windows:**
+    ```bash
+    python -m venv venv
+    .\venv\Scripts\activate
+    ```
+
+### 3. Install required packages from the 'requirements.txt' file 
+```bash
+pip install -r requirements.txt
+
+```
+
+### 4. Run the Streamlit Application
+
+Go to bsm_app directory and launch the Streamlit app from your terminal:
+```bash
+cd bsm_app
+streamlit run app.py
+```
 
 
 ## Background Information 
