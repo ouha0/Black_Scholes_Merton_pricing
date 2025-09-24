@@ -8,7 +8,7 @@ def black_scholes(S, K, T, r, sigma, option_type='call'):
     '''
     Calculate the BSM option price for a call or option.
     Parameters:
-    S (float): Current stock price 
+    S (float): Current stock price
     K (float): Strike Price
     T (float): Time to maturity in years
     r (float): risk-free rate annualized
@@ -86,7 +86,7 @@ def rho(S, K, T, r, sigma, option_type='call'):
         raise ValueError("Invalid option type. Choose 'call' or 'put'")
 
 
-''' 
+'''
 Solves for implied volatility; returns none
 if vega is 0 (Option price insensitive to volatility)
 '''

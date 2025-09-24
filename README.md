@@ -1,10 +1,10 @@
 # Options pricing and Analysis Toolkit
 
-A web-based financial toolkit built with Python and Streamlit for pricing European(exercise only at expiry) options using the 
-Black-Scholes-Merton model and for analyzing real-world implied volatility (surfaces; not done yet) from market data. 
+A web-based financial toolkit built with Python and Streamlit for pricing European(exercise only at expiry) options using the
+Black-Scholes-Merton model and for analyzing real-world implied volatility (surfaces; not done yet) from market data.
 
 ## Features
-* **Interactive BSM Pricer:** 
+* **Interactive BSM Pricer:**
     * Calculates Call and Put options prices for European options.
     * Computes and displays Greeks (Delta, Gamma, Vega, Theta, Rho).
     * Calculates and visualizes Profit and Loss (PNL)
@@ -14,7 +14,7 @@ Black-Scholes-Merton model and for analyzing real-world implied volatility (surf
 * **Real-time Volatility Smile/Skew:**
     * Fetches live option chain data for any ticker using the 'yfinance' library.
     * Calculates the implied volatility for each option using the Newton-Raphson method.
-    * Plots the "Volatility Smile/Skew," revealing market risk perceptions.
+    * Plots the "Volatility Smile" and Volatility surface, revealing market risk perceptions.
 
 ## To Add
 * **Backend Database:**
@@ -48,7 +48,7 @@ cd Black_Scholes_Merton_pricing
     .\venv\Scripts\activate
     ```
 
-### 3. Install required packages from the 'requirements.txt' file 
+### 3. Install required packages from the 'requirements.txt' file
 ```bash
 pip install -r requirements.txt
 
@@ -61,10 +61,12 @@ Go to bsm_app directory and launch the Streamlit app from your terminal:
 cd bsm_app
 streamlit run app.py
 ```
+The web browser should automatically open the application
 
 
-## Background Information 
-* **Black-Scholes-Merton model:** 
-* ** Greeks:** 
-* ** Implied Volatility:** 
+
+## Background Information
+* **Black-Scholes-Merton model:**
+* ** Greeks:**
+* ** Implied Volatility:**
 
