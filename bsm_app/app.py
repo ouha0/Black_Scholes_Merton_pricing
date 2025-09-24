@@ -121,13 +121,6 @@ with tab1:
         st.metric("Put Rho", f"{put_rho:.4f}")
 
 
-# --- Heatmap Sentitivity Analysis ---
-analysis_type = st.radio(
-    "Select Analysis Type",
-    ("Option Price", 'PNL'),
-    horizontal=True
-)
-
 
 # --- Data generation for heatmap ---
 # Evenly spaced numbers between the specified range
