@@ -2,6 +2,9 @@ import streamlit as st
 import bsm_model as bsm  # import bsm model
 import numpy as np
 import plotly.graph_objects as go
+import database as db
+from datetime import datetime
+import pandas as pd
 
 # This file will contain all the frontend
 
@@ -57,7 +60,8 @@ put_pnl = put_price - purchase_price
 
 
 # --- Split Using Tabs for less clutter ---
-tab1, tab2 = st.tabs(["Price and Greeks", "Sensitivity Heatmap"])
+tab1, tab2, tab3 = st.tabs(
+    ["Price and Greeks", "Sensitivity Heatmap", "Scenario History"])
 
 
 # --- Pricer and the Greeks ---
@@ -87,15 +91,15 @@ with tab1:
 
     # Calls
     call_delta = bsm.delta(S, K, T, r, sigma, 'call')
-    call_gamma = bsm.gamma(S, K, T, r, sigma)
-    call_vega = bsm.vega(S, K, T, r, sigma)
+    gamma = bsm.gamma(S, K, T, r, sigma)
+    vega = bsm.vega(S, K, T, r, sigma)
     call_theta = bsm.theta(S, K, T, r, sigma, 'call')
     call_rho = bsm.rho(S, K, T, r, sigma, 'call')
 
     # Calculate Greeks for Put
     put_delta = bsm.delta(S, K, T, r, sigma, 'put')
-    put_gamma = bsm.gamma(S, K, T, r, sigma)
-    put_vega = bsm.vega(S, K, T, r, sigma)
+    # put_gamma = bsm.gamma(S, K, T, r, sigma)
+    # put_vega = bsm.vega(S, K, T, r, sigma)
     put_theta = bsm.theta(S, K, T, r, sigma, 'put')
     put_rho = bsm.rho(S, K, T, r, sigma, 'put')
 
@@ -106,10 +110,10 @@ with tab1:
 
     # Gamma and Vega same for put and call
     with row1_cols[1]:
-        st.metric("Gamma", f"{call_gamma:.4f}")
+        st.metric("Gamma", f"{gamma:.4f}")
 
     with row1_cols[2]:
-        st.metric("Vega", f"{call_vega:.4f}")
+        st.metric("Vega", f"{vega:.4f}")
 
     # --- Row 2: Theta, Rho ---
     with row2_cols[0]:
@@ -119,7 +123,6 @@ with tab1:
     with row2_cols[1]:
         st.metric("Call Rho", f"{call_rho:.4f}")
         st.metric("Put Rho", f"{put_rho:.4f}")
-
 
 
 # --- Data generation for heatmap ---
@@ -199,3 +202,47 @@ with tab2:
     )
 
     st.plotly_chart(fig, use_container_width=True)
+
+
+# tab to save bsm scenarios into database and display past scenarios
+with tab3:
+    st.header("Scenario History")
+
+    # Button to trigger save scenario
+    if st.button("Save Current Scenario"):
+        # Make data into database format
+        scenario_data = {
+            "timestamp": datetime.now(),
+            "S": S,
+            "K": K,
+            "T": T,
+            "r": r,
+            "sigma": sigma,
+            "call_price": call_price,
+            "put_price": put_price,
+            "call_delta": bsm.delta(S, K, T, r, sigma, 'call'),
+            "put_delta": bsm.delta(S, K, T, r, sigma, 'put'),
+            "gamma": bsm.gamma(S, K, T, r, sigma),
+            "vega": bsm.vega(S, K, T, r, sigma)
+        }
+
+        # Call save data from database module
+        db.save_scenario(scenario_data)
+        st.success("Scenario saved successfully.")
+
+    st.markdown("---")
+    st.write("Log of saved scenarios")
+
+    history_df = db.load_scenarios()
+
+    # Make timestamp format more readable / user friendly
+    if not history_df.empty and 'timestamp' in history_df.columns:
+        # Convert datetime text to datetime object
+        history_df['timestamp'] = pd.to_datetime(history_df['timestamp'])
+
+        # Change datetime format back to string in more readable format
+        history_df['timestamp'] = history_df['timestamp'].dt.strftime(
+            '%Y-%m-%d %I:%M:%S %p')
+
+    # Display dataframe
+    st.dataframe(history_df, width="stretch")
