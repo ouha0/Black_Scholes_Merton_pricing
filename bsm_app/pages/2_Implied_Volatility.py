@@ -58,13 +58,16 @@ def generate_surface_data(ticker, r, min_volume, min_open_interest):
     if not S or not expirations:
         return None, None, None
 
+    # When T is close to zero, numerical calculation of IV becomes inaccurate
+    MIN_EXPIRATIONS = 7
+
     all_options_list = []
     for expiry in expirations:
         expiry_date = pd.to_datetime(expiry)
         today = pd.to_datetime('today').normalize()
         days_to_expiry = (expiry_date - today).days
 
-        if days_to_expiry < 2:
+        if days_to_expiry < MIN_EXPIRATIONS:
             continue
         T = days_to_expiry / 365.25
 
@@ -240,7 +243,7 @@ if ticker:
 
                 fig.update_layout(
                     title=(f"Implied Volatility Smile for "
-                           f"{ticker.upper()} @ {selected_expiry}"),
+                           f" {ticker.upper()} @ {selected_expiry}"),
                     xaxis_title="Strike Price ($)",
                     yaxis_title="Implied Volatility (σ)",
                     yaxis_tickformat=".0%",
@@ -271,7 +274,7 @@ if ticker:
                     # Graph naming
                     fig.update_layout(
                         title=(f"Implied Volatility Surface for"
-                               f"{ticker.upper()}"),
+                               f" {ticker.upper()}"),
                         scene=dict(
                             xaxis_title='Moneyness (K/S)',
                             yaxis_title='Time to Maturity (Years)',
@@ -296,4 +299,4 @@ if ticker:
 
     else:
         st.error(f"Could not fetch data for ticker"
-                 f"{ticker}. Check the ticker symbol.")
+                 f" {ticker}. Check the ticker symbol.")
