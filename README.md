@@ -59,7 +59,7 @@ pip install -r requirements.txt
 Go to bsm_app directory and launch the Streamlit app from your terminal:
 ```bash
 cd bsm_app
-streamlit run app.py
+streamlit run 1_BSM_Pricer.py
 ```
 The web browser should automatically open the application
 
