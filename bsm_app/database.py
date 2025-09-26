@@ -76,5 +76,16 @@ def load_scenarios():
     return df
 
 
+def delete_all_scenarios():
+    """Delete all records from bsm_scenarios table"""
+    con = get_db_connection()
+    cursor = con.cursor()
+
+    # Execute command and close down connection
+    cursor.execute("DELETE FROM bsm_scenarios")
+    con.commit()
+    con.close()
+
+
 # Create the database table when database.py is first imported into the app
 create_tables()

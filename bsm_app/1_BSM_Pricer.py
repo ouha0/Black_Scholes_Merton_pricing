@@ -282,3 +282,12 @@ with tab3:
     else:
         st.info(
             "No scenarios saved yet. Used 'Save Current Scenario' button to add scenarios to history")
+
+    # Delete feature to delete all historical scenarios
+    with st.expander("⚠️  Delete Scenario History"):
+        if st.button("Delete All Saved Scenarios"):
+            db.delete_all_scenarios()
+            st.success("All saved scenarios have been deleted.")
+
+            # Refresh display
+            st.rerun()
