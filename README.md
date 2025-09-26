@@ -3,6 +3,9 @@
 A web-based financial toolkit built with Python and Streamlit for pricing European(exercise only at expiry) options using the
 Black-Scholes-Merton model and for analyzing real-world implied volatility (surfaces; not done yet) from market data.
 
+## Link (Streamlit Cloud)
+https://bsm-vol-app.streamlit.app
+
 ## Features
 * **Interactive BSM Pricer:**
     * Calculates Call and Put options prices for European options.
@@ -16,9 +19,9 @@ Black-Scholes-Merton model and for analyzing real-world implied volatility (surf
     * Calculates the implied volatility for each option using the Newton-Raphson method.
     * Plots the "Volatility Smile" and Volatility surface, revealing market risk perceptions.
 
-## To Add
 * **Backend Database:**
     * Save and retrieve pricing scenario
+    * Delete history of scenarios
 
 ## Tech Stack
 
