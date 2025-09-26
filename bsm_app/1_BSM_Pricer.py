@@ -23,23 +23,29 @@ st.markdown(
 # Sidebar for user inputs
 st.sidebar.header("Model Parameters")
 
-# User inputs
+# User inputs. Gets value from session state / or uses the default value
 S = st.sidebar.number_input(
-    "Spot Price (S)", min_value=0.1, value=40.0, step=0.01)
+    "Spot Price (S)", min_value=0.1, value=st.session_state.get('S_val', 40.0),
+    step=0.01)
 
 K = st.sidebar.number_input(
-    "Strike Price (K)", min_value=0.1, value=45.0, step=0.01)
+    "Strike Price (K)", min_value=0.1, value=st.session_state.get('K_val', 45.0),
+    step=0.01)
 
 T = st.sidebar.number_input(
-    "Time to Maturity (T in years)", min_value=0.01, value=0.33, step=0.01)
+    "Time to Maturity (T in years)", min_value=0.01, value=st.session_state.get('T_val', 0.33),
+    step=0.01)
 
 r = st.sidebar.slider("Risk-Free Rate (r)", 0.0, 0.2,
-                      value=0.03, step=0.001, format="%.3f")
+                      value=st.session_state.get('r_val', 0.03),
+                      step=0.001, format="%.3f")
 
-sigma = st.sidebar.slider("Volatility (σ)", 0.01, 1.0, value=0.4, step=0.01)
+sigma = st.sidebar.slider("Volatility (σ)", 0.01, 1.0,
+                          value=st.session_state.get('sigma_val', 0.40), step=0.01)
 
 purchase_price = st.sidebar.number_input(
-    "Purchase Price", min_value=0.0, value=5.0, step=0.01)
+    "Purchase Price", min_value=0.0, value=st.session_state.get('purchase_price', 5.0),
+    step=0.01)
 
 with st.sidebar.expander("About the Inputs"):
     st.write(
@@ -231,18 +237,48 @@ with tab3:
         st.success("Scenario saved successfully.")
 
     st.markdown("---")
-    st.write("Log of saved scenarios")
+    # st.write("Log of saved scenarios")
 
     history_df = db.load_scenarios()
 
     # Make timestamp format more readable / user friendly
-    if not history_df.empty and 'timestamp' in history_df.columns:
-        # Convert datetime text to datetime object
-        history_df['timestamp'] = pd.to_datetime(history_df['timestamp'])
+    if not history_df.empty:
+        st.write("Click 'Load' to restore saved scneario's inputs onto sidebar.")
 
-        # Change datetime format back to string in more readable format
-        history_df['timestamp'] = history_df['timestamp'].dt.strftime(
-            '%Y-%m-%d %I:%M:%S %p')
+        # Display logic
+        # Define columns / header
+        cols = st.columns([1, 4, 2, 2, 2, 2, 2, 2, 2])  # Set width of columns
+        headers = ["Load", "Timestamp", "Spot",
+                   "Strike", "Time to Maturity", "Vol", "Risk-free rate", "Call Price", "Put Price"]
+        for col, header in zip(cols, headers):
+            col.write(f"**{header}**")
 
-    # Display dataframe
-    st.dataframe(history_df, width="stretch")
+        # Iterate through scenarios and create interactive row
+        for index, row in history_df.iterrows():
+            cols = st.columns([1, 4, 2, 2, 2, 2, 2, 2, 2])
+
+            # Load button for each row
+            if cols[0].button("▶", key=f"load_{row['id']}"):
+                st.session_state['S_val'] = row['spot_price']
+                st.session_state['K_val'] = row['strike_price']
+                st.session_state['T_val'] = row['time_to_maturity']
+                st.session_state['r_val'] = row['risk_free_rate']
+                st.session_state['sigma_val'] = row['volatility']
+
+                st.rerun()
+
+            # Display data for each row in other colums
+            timestamp_str = pd.to_datetime(
+                row['timestamp']).strftime('%Y-%m-%d %I:%M:%S %p')
+            cols[1].write(timestamp_str)
+            cols[2].write(f"{row['spot_price']:.2f}")
+            cols[3].write(f"{row['strike_price']:.2f}")
+            cols[4].write(f"{row['time_to_maturity']:.2f}")
+            cols[5].write(f"{row['volatility']:.2f}")
+            cols[6].write(f"{row['risk_free_rate']:.2f}")
+            cols[7].write(f"{row['call_price']:.2f}")
+            cols[8].write(f"{row['put_price']:.2f}")
+
+    else:
+        st.info(
+            "No scenarios saved yet. Used 'Save Current Scenario' button to add scenarios to history")
