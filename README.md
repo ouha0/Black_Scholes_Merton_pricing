@@ -71,6 +71,6 @@ The web browser should automatically open the application
 
 ## Background Information
 * **Black-Scholes-Merton model:**
-* ** Greeks:**
-* ** Implied Volatility:**
+* **Greeks:**
+* **Implied Volatility:**
 
