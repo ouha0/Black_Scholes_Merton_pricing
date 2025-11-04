@@ -6,6 +6,7 @@ Black-Scholes-Merton model and for analyzing real-world implied volatility (surf
 ## Link (Streamlit Cloud)
 https://bsm-vol-app.streamlit.app
 
+(if the app has gone to sleep, click "Yes, get this app back up!" to see it)
 ## Features
 * **Interactive BSM Pricer:**
     * Calculates Call and Put options prices for European options.
