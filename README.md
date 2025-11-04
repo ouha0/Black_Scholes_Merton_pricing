@@ -1,7 +1,7 @@
 # Options pricing and Analysis Toolkit
 
 A web-based financial toolkit built with Python and Streamlit for pricing European(exercise only at expiry) options using the
-Black-Scholes-Merton model and for analyzing real-world implied volatility (surfaces; not done yet) from market data.
+Black-Scholes-Merton model and for analyzing real-world implied volatility smile and surfaces from market data.
 
 ## Link (Streamlit Cloud)
 https://bsm-vol-app.streamlit.app
